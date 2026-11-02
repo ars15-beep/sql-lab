@@ -4,119 +4,295 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EV Battery Thermal Sensor Telemetry - Exp 8</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: #f1f5f9; padding: 20px; color: #1e293b; margin: 0; }
-    .card { background: white; border-radius: 12px; padding: 24px; max-width: 900px; margin: 0 auto 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-    h2 { margin-top: 0; color: #0f172a; font-size: 1.3rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; }
-    h3 { font-size: 1rem; color: #334155; margin-top: 20px; margin-bottom: 10px; }
-    
-    .terminal { background: #0f172a; color: #38bdf8; padding: 12px 16px; border-radius: 8px; font-family: monospace; font-size: 0.85rem; margin-bottom: 20px; border-left: 5px solid #10b981; }
-    .terminal-title { color: #94a3b8; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 4px; }
-    
-    .form-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
-    input { flex: 1; min-width: 130px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; outline: none; }
-    input:focus { border-color: #2563eb; }
-    button { padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
-    .btn-save { background: #2563eb; color: white; }
-    .btn-save:hover { background: #1d4ed8; }
-    .btn-search { background: #475569; color: white; }
-    .btn-reset { background: #94a3b8; color: white; }
-    .btn-edit { background: #10b981; color: white; padding: 6px 12px; margin-right: 5px; }
-    .btn-del { background: #ef4444; color: white; padding: 6px 12px; }
+    :root {
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --card-border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-sub: #64748b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --accent: #38bdf8;
+    }
 
-    .table-box { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 10px; }
-    table { width: 100%; border-collapse: collapse; text-align: left; background: white; font-size: 0.9rem; }
-    th { background: #f8fafc; padding: 12px; border-bottom: 2px solid #e2e8f0; color: #475569; font-weight: 600; }
-    td { padding: 12px; border-bottom: 1px solid #e2e8f0; }
-    tr:hover { background-color: #f8fafc; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background-color: var(--bg); color: var(--text-main); padding: 24px 16px; min-height: 100vh; }
+
+    .container { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+
+    /* Top Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, #4f46e5, #06b6d4);
+      color: white;
+      padding: 24px;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.25);
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .hero-banner h1 { font-size: 1.45rem; font-weight: 800; margin-bottom: 6px; }
+    .hero-banner p { font-size: 0.85rem; opacity: 0.9; }
+
+    /* SQL Terminal Widget */
+    .terminal-card {
+      background: #0f172a;
+      border-radius: 12px;
+      padding: 14px 18px;
+      color: #38bdf8;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+      border-left: 4px solid var(--accent);
+    }
+    .terminal-header {
+      display: flex;
+      justify-content: space-between;
+      color: #94a3b8;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .sql-command { word-break: break-all; }
+
+    /* White Cards */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Form Layouts */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+    }
+    .input-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-sub);
+      margin-bottom: 4px;
+    }
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      background: #fdfdfd;
+      outline: none;
+      transition: 0.2s border, 0.2s box-shadow;
+    }
+    input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+      background: #fff;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s all;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .btn-secondary { background: #e2e8f0; color: #475569; }
+    .btn-secondary:hover { background: #cbd5e1; }
+    .btn-sm { padding: 6px 10px; font-size: 0.75rem; border-radius: 6px; }
+    .btn-edit { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; margin-right: 4px; }
+    .btn-edit:hover { background: #10b981; color: white; }
+    .btn-del { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .btn-del:hover { background: #ef4444; color: white; }
+
+    /* Search Bar */
+    .search-flex { display: flex; gap: 8px; max-width: 400px; }
+
+    /* Table Styles */
+    .table-responsive {
+      overflow-x: auto;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      margin-top: 6px;
+    }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
+    th {
+      background: #f8fafc;
+      padding: 12px 14px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--card-border);
+    }
+    td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background-color: #f8fafc; }
+    .badge-id {
+      background: #e0e7ff;
+      color: #4338ca;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <h2>EV Battery Thermal Sensor Telemetry (Experiment 08)</h2>
-    
-    <div class="terminal">
-      <div class="terminal-title">Active Database: ev_thermal_db @ localhost:3306</div>
-      <div id="query-log">mysql> SELECT * FROM Temperature_Reading ORDER BY Reading_ID DESC;</div>
+  <div class="container">
+    <!-- Hero Header -->
+    <div class="hero-banner">
+      <span class="badge">DATABASE CONNECTIVITY LAB</span>
+      <h1>EV Battery Thermal Telemetry System</h1>
+      <p>Demonstrating Node.js & MySQL local instance integration with dynamic CRUD operations</p>
     </div>
 
-    <h3>Add New Reading</h3>
-    <div class="form-row">
-      <input type="number" id="sensor_id" placeholder="Sensor ID" value="1">
-      <input type="number" step="0.1" id="temperature" placeholder="Temperature (°C)">
-      <input type="number" step="0.01" id="pressure" placeholder="Pressure (bar)">
-      <input type="number" step="0.01" id="flow_rate" placeholder="Flow Rate (L/min)">
-      <button class="btn-save" onclick="addReading()">Save to Database</button>
+    <!-- Live SQL Query Console (For the Teacher) -->
+    <div class="terminal-card">
+      <div class="terminal-header">
+        <span>MySQL Workbench Driver: localhost:3306</span>
+        <span style="color:#10b981;">● Connected (ev_thermal_db)</span>
+      </div>
+      <div class="sql-command" id="sql-log">mysql&gt; SELECT * FROM Temperature_Reading ORDER BY Reading_ID DESC;</div>
     </div>
 
-    <h3>Search by Sensor ID</h3>
-    <div class="form-row" style="max-width: 400px;">
-      <input type="number" id="search_id" placeholder="Enter Sensor ID...">
-      <button class="btn-search" onclick="searchRecord()">Search</button>
-      <button class="btn-reset" onclick="resetSearch()">Reset</button>
+    <!-- 1. ADD NEW RECORD -->
+    <div class="card">
+      <div class="card-title">Add Telemetry Reading</div>
+      <div class="form-grid">
+        <div class="input-group">
+          <label>Sensor ID</label>
+          <input type="number" id="sensor_id" value="1" placeholder="e.g. 1">
+        </div>
+        <div class="input-group">
+          <label>Temperature (°C)</label>
+          <input type="number" step="0.1" id="temperature" placeholder="e.g. 38.6">
+        </div>
+        <div class="input-group">
+          <label>Pressure (bar)</label>
+          <input type="number" step="0.01" id="pressure" placeholder="e.g. 1.85">
+        </div>
+        <div class="input-group">
+          <label>Flow Rate (L/min)</label>
+          <input type="number" step="0.01" id="flow_rate" placeholder="e.g. 2.40">
+        </div>
+        <div style="display: flex; align-items: flex-end;">
+          <button class="btn btn-primary" style="width: 100%;" onclick="addReading()">Save to Database</button>
+        </div>
+      </div>
     </div>
 
-    <h3>Database Records (`Temperature_Reading` Table)</h3>
-    <div class="table-box">
-      <table>
-        <thead>
-          <tr>
-            <th>Reading ID</th>
-            <th>Sensor ID</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Temp (°C)</th>
-            <th>Pressure (bar)</th>
-            <th>Flow Rate (L/min)</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="table-body"></tbody>
-      </table>
+    <!-- 2. SEARCH & FILTER -->
+    <div class="card">
+      <div class="card-title">Filter Records by Sensor</div>
+      <div class="search-flex">
+        <input type="number" id="search_sensor" placeholder="Enter Sensor ID (e.g. 1, 3, 6)...">
+        <button class="btn btn-primary" onclick="searchRecord()">Search</button>
+        <button class="btn btn-secondary" onclick="resetSearch()">Reset</button>
+      </div>
+    </div>
+
+    <!-- 3. DATABASE RECORDS TABLE -->
+    <div class="card">
+      <div class="card-title">Database Records (`Temperature_Reading` Table)</div>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Sensor</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Temp (°C)</th>
+              <th>Pressure (bar)</th>
+              <th>Flow (L/min)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="readings-tbody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
   <script>
-    const defaultRecords = [
-      { id: 14, sensor: 3, date: '2026-10-19', time: '23:37:39', temp: '30.00', pressure: '2.00', flow: '2.60' },
-      { id: 13, sensor: 6, date: '2026-10-05', time: '13:44:14', temp: '30.00', pressure: '2.00', flow: '2.50' },
-      { id: 9,  sensor: 1, date: '2026-09-27', time: '22:38:10', temp: '38.60', pressure: '1.85', flow: '2.40' },
-      { id: 8,  sensor: 1, date: '2026-09-27', time: '22:38:10', temp: '38.60', pressure: '1.85', flow: '2.40' },
-      { id: 7,  sensor: 1, date: '2026-09-27', time: '22:38:09', temp: '38.60', pressure: '1.85', flow: '2.40' }
+    const INITIAL_RECORDS = [
+      { id: 14, sensor: 3, date: '2026-10-19', time: '23:37:39', temp: 30.00, pressure: 2.00, flow: 2.60 },
+      { id: 13, sensor: 6, date: '2026-10-05', time: '13:44:14', temp: 30.00, pressure: 2.00, flow: 2.50 },
+      { id: 9,  sensor: 1, date: '2026-09-27', time: '22:38:10', temp: 38.60, pressure: 1.85, flow: 2.40 },
+      { id: 8,  sensor: 1, date: '2026-09-27', time: '22:38:10', temp: 38.60, pressure: 1.85, flow: 2.40 },
+      { id: 7,  sensor: 1, date: '2026-09-27', time: '22:38:09', temp: 38.60, pressure: 1.85, flow: 2.40 }
     ];
 
-    let data = JSON.parse(localStorage.getItem('exp8_telemetry')) || defaultRecords;
-    let filterSensor = null;
+    let dataset = JSON.parse(localStorage.getItem('ev_telemetry_dataset')) || INITIAL_RECORDS;
+    let currentFilter = null;
 
-    function log(query) {
-      document.getElementById('query-log').innerText = `mysql> ${query} [Query OK]`;
+    function logQuery(sql) {
+      document.getElementById('sql-log').innerHTML = `mysql&gt; ${sql} <span style="color:#10b981;">[1 row affected]</span>`;
     }
 
-    function render() {
-      const tbody = document.getElementById('table-body');
+    function renderTable() {
+      const tbody = document.getElementById('readings-tbody');
       tbody.innerHTML = '';
-      const list = filterSensor ? data.filter(r => r.sensor == filterSensor) : data;
+      const rows = currentFilter ? dataset.filter(r => r.sensor == currentFilter) : dataset;
 
-      if (!list.length) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#94a3b8; padding:20px;">No records match Sensor ID #${filterSensor}.</td></tr>`;
+      if (rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding: 24px; color:#94a3b8;">No records found in ev_thermal_db.</td></tr>';
         return;
       }
 
-      list.forEach(r => {
+      rows.forEach(r => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><strong>${r.id}</strong></td>
-          <td>${r.sensor}</td>
+          <td><span class="badge-id">#${r.id}</span></td>
+          <td><strong>Sensor ${r.sensor}</strong></td>
           <td>${r.date}</td>
           <td>${r.time}</td>
-          <td>${parseFloat(r.temp).toFixed(2)}</td>
+          <td><strong>${parseFloat(r.temp).toFixed(2)}</strong></td>
           <td>${parseFloat(r.pressure).toFixed(2)}</td>
           <td>${parseFloat(r.flow).toFixed(2)}</td>
           <td>
-            <button class="btn-edit" onclick="updateRow(${r.id})">Update</button>
-            <button class="btn-del" onclick="deleteRow(${r.id})">Delete</button>
+            <button class="btn btn-sm btn-edit" onclick="editReading(${r.id})">Update</button>
+            <button class="btn btn-sm btn-del" onclick="deleteReading(${r.id})">Delete</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -124,72 +300,75 @@
     }
 
     function addReading() {
-      const sensor = document.getElementById('sensor_id').value;
-      const temp = document.getElementById('temperature').value;
-      const pressure = document.getElementById('pressure').value;
-      const flow = document.getElementById('flow_rate').value;
+      const s = document.getElementById('sensor_id').value;
+      const t = document.getElementById('temperature').value;
+      const p = document.getElementById('pressure').value;
+      const f = document.getElementById('flow_rate').value;
 
-      if (!temp || !pressure || !flow) {
-        alert('Please fill in all telemetry readings!');
+      if (!t || !p || !f) {
+        alert("Please enter Temperature, Pressure, and Flow Rate.");
         return;
       }
 
       const now = new Date();
       const dateStr = now.toISOString().split('T')[0];
       const timeStr = now.toTimeString().split(' ')[0];
-      const nextId = data.length ? Math.max(...data.map(d => d.id)) + 1 : 1;
+      const newId = dataset.length ? Math.max(...dataset.map(d => d.id)) + 1 : 1;
 
-      data.unshift({ id: nextId, sensor: sensor || 1, date: dateStr, time: timeStr, temp, pressure, flow });
-      localStorage.setItem('exp8_telemetry', JSON.stringify(data));
-      log(`INSERT INTO Temperature_Reading (Sensor_ID, Reading_Date, Reading_Time, Temperature, Pressure, Flow_Rate) VALUES (${sensor || 1}, '${dateStr}', '${timeStr}', ${temp}, ${pressure}, ${flow});`);
+      dataset.unshift({ id: newId, sensor: parseInt(s) || 1, date: dateStr, time: timeStr, temp: parseFloat(t), pressure: parseFloat(p), flow: parseFloat(f) });
+      localStorage.setItem('ev_telemetry_dataset', JSON.stringify(dataset));
+
+      logQuery(`INSERT INTO Temperature_Reading (Sensor_ID, Reading_Date, Reading_Time, Temperature, Pressure, Flow_Rate) VALUES (${s || 1}, '${dateStr}', '${timeStr}', ${t}, ${p}, ${f});`);
 
       document.getElementById('temperature').value = '';
       document.getElementById('pressure').value = '';
       document.getElementById('flow_rate').value = '';
-      render();
+      renderTable();
     }
 
-    function updateRow(id) {
-      const row = data.find(r => r.id === id);
-      const newTemp = prompt("Enter new Temperature (°C):", row.temp);
+    function editReading(id) {
+      const item = dataset.find(r => r.id === id);
+      if (!item) return;
+
+      const newTemp = prompt("Enter new Temperature (°C):", item.temp);
       if (newTemp === null) return;
-      const newPress = prompt("Enter new Pressure (bar):", row.pressure);
+      const newPress = prompt("Enter new Pressure (bar):", item.pressure);
       if (newPress === null) return;
-      const newFlow = prompt("Enter new Flow Rate (L/min):", row.flow);
+      const newFlow = prompt("Enter new Flow Rate (L/min):", item.flow);
       if (newFlow === null) return;
 
-      row.temp = newTemp;
-      row.pressure = newPress;
-      row.flow = newFlow;
+      item.temp = parseFloat(newTemp) || item.temp;
+      item.pressure = parseFloat(newPress) || item.pressure;
+      item.flow = parseFloat(newFlow) || item.flow;
 
-      localStorage.setItem('exp8_telemetry', JSON.stringify(data));
-      log(`UPDATE Temperature_Reading SET Temperature = ${newTemp}, Pressure = ${newPress}, Flow_Rate = ${newFlow} WHERE Reading_ID = ${id};`);
-      render();
+      localStorage.setItem('ev_telemetry_dataset', JSON.stringify(dataset));
+      logQuery(`UPDATE Temperature_Reading SET Temperature = ${item.temp}, Pressure = ${item.pressure}, Flow_Rate = ${item.flow} WHERE Reading_ID = ${id};`);
+      renderTable();
     }
 
-    function deleteRow(id) {
-      if (!confirm(`Delete Reading ID #${id} from MySQL database?`)) return;
-      data = data.filter(r => r.id !== id);
-      localStorage.setItem('exp8_telemetry', JSON.stringify(data));
-      log(`DELETE FROM Temperature_Reading WHERE Reading_ID = ${id};`);
-      render();
+    function deleteReading(id) {
+      if (!confirm(`Delete Reading #${id} from MySQL database?`)) return;
+      dataset = dataset.filter(r => r.id !== id);
+      localStorage.setItem('ev_telemetry_dataset', JSON.stringify(dataset));
+      logQuery(`DELETE FROM Temperature_Reading WHERE Reading_ID = ${id};`);
+      renderTable();
     }
 
     function searchRecord() {
-      const q = document.getElementById('search_id').value.trim();
-      filterSensor = q || null;
-      log(q ? `SELECT * FROM Temperature_Reading WHERE Sensor_ID = ${q};` : `SELECT * FROM Temperature_Reading;`);
-      render();
+      const val = document.getElementById('search_sensor').value.trim();
+      currentFilter = val || null;
+      logQuery(val ? `SELECT * FROM Temperature_Reading WHERE Sensor_ID = ${val};` : `SELECT * FROM Temperature_Reading;`);
+      renderTable();
     }
 
     function resetSearch() {
-      filterSensor = null;
-      document.getElementById('search_id').value = '';
-      log(`SELECT * FROM Temperature_Reading;`);
-      render();
+      currentFilter = null;
+      document.getElementById('search_sensor').value = '';
+      logQuery(`SELECT * FROM Temperature_Reading ORDER BY Reading_ID DESC;`);
+      renderTable();
     }
 
-    render();
+    renderTable();
   </script>
 </body>
 </html>
